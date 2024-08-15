@@ -1,4 +1,4 @@
-name: Build and Publish Docker Image
+name: Build and Scan Docker Image
 
 on:
   push:
@@ -11,13 +11,13 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3  # Utiliser la dernière version de l'action
+      uses: actions/checkout@v3
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2  # Utiliser la dernière version de l'action
+      uses: docker/setup-buildx-action@v2
 
     - name: Cache Docker layers
-      uses: actions/cache@v3  # Utiliser la dernière version de l'action
+      uses: actions/cache@v3
       with:
         path: /tmp/.buildx-cache
         key: ${{ runner.os }}-buildx-${{ github.sha }}
@@ -25,14 +25,29 @@ jobs:
           ${{ runner.os }}-buildx-
 
     - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v2  # Utiliser la dernière version de l'action
+      uses: docker/login-action@v2
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GHCR_PAT }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v4  # Utiliser la dernière version de l'action
+    - name: Build Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        push: false  # Ne pas pousser l'image encore
+        tags: ghcr.io/mandarun-creator/labo:latest
+
+    - name: Scan Docker image with Trivy
+      uses: aquasecurity/trivy-action@v0.10.0
+      with:
+        image-ref: ghcr.io/mandarun-creator/labo:latest
+        format: 'table'  # Format de sortie du rapport (table ou json)
+        exit-code: 1  # Retourne un code de sortie non nul en cas de vulnérabilités
+
+    - name: Push Docker image
+      if: success()  # Ne pousse l'image que si le scan est réussi
+      uses: docker/build-push-action@v4
       with:
         context: .
         push: true
