@@ -36,4 +36,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/ue19-labo:latest  # Nom de l'image en minuscules
+        tags: ghcr.io/${{ github.repository_owner }}/ue19labo:latest  # Nom de l'image en minuscules
