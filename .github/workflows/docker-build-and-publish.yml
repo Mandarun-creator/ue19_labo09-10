@@ -39,7 +39,7 @@ jobs:
         tags: ghcr.io/mandarun-creator/labo:latest
 
     - name: Scan Docker image with Trivy
-      uses: aquasecurity/trivy-action@v0.54.1
+      uses: aquasecurity/trivy-action@v0.24.0
       with:
         image-ref: ghcr.io/mandarun-creator/labo:latest
         format: 'table'  # Format de sortie du rapport (table ou json)
